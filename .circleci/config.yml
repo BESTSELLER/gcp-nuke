@@ -77,7 +77,6 @@ workflows:
           release-type: test
           requires:
             - secret-injector/dump-secrets
-            - test
           <<: *test_filter
           <<: *context
   build-n-release:
