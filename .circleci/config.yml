@@ -1,7 +1,15 @@
 version: 2.1
 
+executors:
+  go_image:
+    docker:
+      - image: cimg/go:1.17
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASS
+
 orbs:
-  secret-injector: bestsellerit/secret-injector@0.2.34
+  secret-injector: bestsellerit/secret-injector@1.5.4
 
 commands:
   goreleaser:
@@ -12,14 +20,14 @@ commands:
       - run:
           name: Import private key
           command: |
-            source /tmp/secrets.env
+            source /tmp/secrets
             apk add gnupg
             echo -e "$GPG_PRIVATE_KEY" | base64 -d > $HOME/private.key
             gpg --pinentry-mode loopback --batch --yes --import $HOME/private.key
       - run:
           name: Run GoReleaser
           command: |
-            source /tmp/secrets.env
+            source /tmp/secrets
             if [ "<< parameters.release-type >>" = "test" ] ; then
               goreleaser release --snapshot --rm-dist
             else
@@ -33,7 +41,7 @@ jobs:
         enum: ["test", "release"]
         default: "test"
     docker:
-      - image: goreleaser/goreleaser #circleci/golang:1.15
+      - image: goreleaser/goreleaser
     steps:
       - checkout
       - attach_workspace:
@@ -41,43 +49,47 @@ jobs:
       - goreleaser:
           release-type: << parameters.release-type >>
 
-tag_filter: &tag_filter /v[0-9]+.[0-9]+.[0-9]+/
-my_context: &my_context es02-prod
 
 test_filter: &test_filter
   filters:
     tags:
-      ignore: *tag_filter
+      ignore: /v[0-9]+.[0-9]+.[0-9]+/
 release_filter: &release_filter
   filters:
     branches:
       ignore: /.*/
     tags:
-      only: *tag_filter
+      only: /v[0-9]+.[0-9]+.[0-9]+/
+context: &context
+  context: 
+    - es02-prod
+    - shared
 
 workflows:
-  version: 2
-  tester:
+  test:
     jobs:
       - secret-injector/dump-secrets:
-          <<: *dump_secrets
-          context: *my_context
+          vault-path: ES/data/terraform-provider/prod
           <<: *test_filter
+          <<: *context
       - build:
+          name: build_n_release_test
           release-type: test
-          name: test
           requires:
             - secret-injector/dump-secrets
+            - test
           <<: *test_filter
+          <<: *context
   build-n-release:
     jobs:
       - secret-injector/dump-secrets:
-          <<: *dump_secrets
-          context: *my_context
+          vault-path: ES/data/terraform-provider/prod
           <<: *release_filter
+          <<: *context
       - build:
-          name: build
+          name: build_n_release
           release-type: release
           requires:
             - secret-injector/dump-secrets
           <<: *release_filter
+          <<: *context
