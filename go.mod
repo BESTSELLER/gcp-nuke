@@ -3,7 +3,7 @@ module github.com/BESTSELLER/gcp-nuke
 go 1.17
 
 require (
-	cloud.google.com/go/bigquery v1.31.0
+	cloud.google.com/go/bigquery v1.32.0
 	github.com/urfave/cli/v2 v2.6.0
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
