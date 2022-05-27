@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	cloud.google.com/go/bigquery v1.32.0
-	github.com/urfave/cli/v2 v2.6.0
+	github.com/urfave/cli/v2 v2.8.1
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	google.golang.org/api v0.79.0
@@ -20,6 +20,7 @@ require (
 	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/googleapis/gax-go/v2 v2.3.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
+	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4 // indirect
 	golang.org/x/sys v0.0.0-20220503163025-988cb79eb6c6 // indirect
