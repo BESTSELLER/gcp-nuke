@@ -1,0 +1,17 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: gcp-nuke
+  description: Is used to properly cleanup gcp projects
+  tags:
+    - gcloud
+    - golang
+    - pipeline
+  annotations:
+    github.com/project-slug:  BESTSELLER/gcp-nuke
+    circleci.com/project-slug: github/BESTSELLER/gcp-nuke
+spec:
+  type: service
+  lifecycle: production
+  owner: engineering-services
+---
