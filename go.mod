@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	cloud.google.com/go/bigquery v1.43.0
-	github.com/urfave/cli/v2 v2.17.1
+	github.com/urfave/cli/v2 v2.23.5
 	golang.org/x/oauth2 v0.0.0-20221014153046-6fdb5e3db783
 	golang.org/x/sync v0.1.0
 	google.golang.org/api v0.103.0
