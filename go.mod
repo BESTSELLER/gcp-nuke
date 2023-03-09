@@ -1,6 +1,6 @@
 module github.com/BESTSELLER/gcp-nuke
 
-go 1.17
+go 1.20
 
 require (
 	cloud.google.com/go/bigquery v1.45.0
