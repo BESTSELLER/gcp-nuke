@@ -42,6 +42,7 @@ jobs:
         default: "test"
     docker:
       - image: goreleaser/goreleaser
+    resource_class: xlarge
     steps:
       - checkout
       - attach_workspace:
