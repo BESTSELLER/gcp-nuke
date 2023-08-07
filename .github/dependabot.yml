@@ -11,3 +11,5 @@ updates:
       interval: "monthly"
     reviewers: 
         - BESTSELLER/engineering-services
+    labels:
+      - "automerge"
