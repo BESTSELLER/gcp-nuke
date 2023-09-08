@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"log"
 	"os"
 
@@ -36,6 +37,12 @@ func Command() {
 				Value: 10,
 				Usage: "Time for polling resource deletion status in seconds",
 			},
+			&cli.StringFlag{
+				Name:    "ExclusionsConfig, ec",
+				Usage:   "Path to exclusions config file",
+				EnvVars: []string{"EXCLUSIONS_CONFIG"},
+				Aliases: []string{"ec"},
+			},
 		},
 		Action: func(c *cli.Context) error {
 
@@ -49,6 +56,25 @@ func Command() {
 				Zones:    gcp.GetZones(gcp.Ctx, c.String("project")),
 				Regions:  gcp.GetRegions(gcp.Ctx, c.String("project")),
 			}
+
+			if c.String("ExclusionsConfig") != "" {
+				// Read exclusions config file and marshall into Config.Exclusions struct
+				var exclusions config.Exclusions
+
+				b, err := os.ReadFile(c.String("ExclusionsConfig"))
+				if err != nil {
+					log.Printf("[Error] Exclusions config file not found at %v", c.String("ExclusionsConfig"))
+					return err
+				}
+
+				err = json.Unmarshal(b, &exclusions)
+				if err != nil {
+					log.Printf("[Error] Exclusions config file could not be parsed")
+				}
+
+				config.Exclusions = exclusions
+			}
+
 			log.Printf("[Info] Timeout %v seconds. Polltime %v seconds. Dry run: %v", config.Timeout, config.PollTime, config.DryRun)
 			gcp.RemoveProject(config)
 
