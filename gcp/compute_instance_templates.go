@@ -86,6 +86,12 @@ func (c *ComputeInstanceTemplates) Remove() error {
 	c.resourceMap.Range(func(key, value interface{}) bool {
 		instanceID := key.(string)
 
+    // Check if a resource is exclued from deletion
+  	if slices.Contains(c.base.config.Exclusions.ComputeInstanceTemplate, instanceID) {
+  		// This instanceID is excluded from deletion, returning
+  		return false
+		}
+
 		// Parallel instance deletion
 		errs.Go(func() error {
 			deleteCall := c.serviceClient.InstanceTemplates.Delete(c.base.config.Project, instanceID)

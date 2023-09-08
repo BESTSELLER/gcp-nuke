@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+ 	"golang.org/x/exp/slices"
 	"github.com/BESTSELLER/gcp-nuke/config"
 	"github.com/BESTSELLER/gcp-nuke/helpers"
 	"golang.org/x/sync/errgroup"
@@ -85,6 +86,12 @@ func (c *ComputeVPNTunnels) Remove() error {
 		tunnelID := key.(string)
 		region := value.(string)
 
+		// Check if a resource is exclued from deletion
+  	if slices.Contains(c.base.config.Exclusions.ComputeVPNTunnel, tunnelID) {
+  		// This instanceID is excluded from deletion, returning
+  		return false
+		}
+		
 		// Parallel tunnel deletion
 		errs.Go(func() error {
 			deleteCall := c.serviceClient.VpnTunnels.Delete(c.base.config.Project, region, tunnelID)
