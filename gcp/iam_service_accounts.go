@@ -5,7 +5,6 @@ import (
 	"strings"
 	"sync"
 
-	"golang.org/x/exp/slices"
 	"github.com/BESTSELLER/gcp-nuke/config"
 	"github.com/BESTSELLER/gcp-nuke/helpers"
 	"golang.org/x/sync/errgroup"
@@ -80,12 +79,6 @@ func (c *IAMServiceAccount) Remove() error {
 
 	c.resourceMap.Range(func(key, value interface{}) bool {
 		emailAddress := value.(string)
-    
-		// Check if a resource is exclued from deletion
-  	if slices.Contains(c.base.config.Exclusions.IAMServiceAccount, emailAddress) {
-  		// This instanceID is excluded from deletion, returning
-  		return false
-		}
 
 		// Parallel instance deletion
 		errs.Go(func() error {

@@ -6,7 +6,6 @@ import (
 	"sync"
 	"time"
 
-	"golang.org/x/exp/slices"
 	"github.com/BESTSELLER/gcp-nuke/config"
 	"github.com/BESTSELLER/gcp-nuke/helpers"
 	"golang.org/x/sync/errgroup"
@@ -88,12 +87,6 @@ func (c *ComputeSubnetworks) Remove() error {
 	c.resourceMap.Range(func(key, value interface{}) bool {
 		subnetworkID := key.(string)
 		region := value.(string)
-
-    // Check if a resource is exclued from deletion
-  	if slices.Contains(c.base.config.Exclusions.ComputeSubNetwork, subnetworkID) {
-  		// This instanceID is excluded from deletion, returning
-  		return false
-		}
 
 		// Parallel subnetwork deletion
 		errs.Go(func() error {

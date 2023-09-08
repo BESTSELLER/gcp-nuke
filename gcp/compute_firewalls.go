@@ -6,7 +6,6 @@ import (
 	"sync"
 	"time"
 
-	"golang.org/x/exp/slices"
 	"github.com/BESTSELLER/gcp-nuke/config"
 	"github.com/BESTSELLER/gcp-nuke/helpers"
 	"golang.org/x/sync/errgroup"
@@ -85,12 +84,6 @@ func (c *ComputeFirewalls) Remove() error {
 
 	c.resourceMap.Range(func(key, value interface{}) bool {
 		firewallID := key.(string)
-
-  	// Check if resource is excluded
-		if slices.Contains(c.base.config.Exclusions.ComputeFirewall, firewallID) {
-   		// Resource is excluded, skip deleting
-			return false
-		}
 
 		// Parallel firewall deletion
 		errs.Go(func() error {
