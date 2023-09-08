@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	"golang.org/x/exp/slices"
 
 	bq "cloud.google.com/go/bigquery"
 	"github.com/BESTSELLER/gcp-nuke/config"
@@ -83,6 +84,12 @@ func (c *BigQueryDataset) Remove() error {
 
 	c.resourceMap.Range(func(key, value interface{}) bool {
 		datasetID := value.(string)
+
+    // Check if a resource is exclued from deletion
+    if slices.Contains(c.base.config.Exclusions.BigQuery, datasetID) {
+   // This datasetID is excluded from deletion, returning
+			return false
+		}
 
 		// Parallel instance deletion
 		errs.Go(func() error {

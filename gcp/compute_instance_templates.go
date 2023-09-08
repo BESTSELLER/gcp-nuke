@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"golang.org/x/exp/slices"
 	"github.com/BESTSELLER/gcp-nuke/config"
 	"github.com/BESTSELLER/gcp-nuke/helpers"
 	"golang.org/x/sync/errgroup"
@@ -85,6 +86,12 @@ func (c *ComputeInstanceTemplates) Remove() error {
 
 	c.resourceMap.Range(func(key, value interface{}) bool {
 		instanceID := key.(string)
+
+    // Check if a resource is exclued from deletion
+  	if slices.Contains(c.base.config.Exclusions.ComputeInstanceTemplate, instanceID) {
+  		// This instanceID is excluded from deletion, returning
+  		return false
+		}
 
 		// Parallel instance deletion
 		errs.Go(func() error {
