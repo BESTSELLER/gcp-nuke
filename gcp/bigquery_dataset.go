@@ -5,10 +5,10 @@ import (
 	"log"
 	"sync"
 
-	"golang.org/x/exp/slices"
 	bq "cloud.google.com/go/bigquery"
 	"github.com/BESTSELLER/gcp-nuke/config"
 	"github.com/BESTSELLER/gcp-nuke/helpers"
+	"golang.org/x/exp/slices"
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sync/syncmap"
 	"google.golang.org/api/bigquery/v2"
@@ -86,8 +86,9 @@ func (c *BigQueryDataset) Remove() error {
 		datasetID := value.(string)
 
 		// Check if a resource is exclued from deletion
-    if slices.Contains(c.base.config.Exclusions.BigQuery, datasetID) {
-   		// This datasetID is excluded from deletion, returning
+		if slices.Contains(c.base.config.Exclusions.BigQuery, datasetID) {
+			log.Printf("[Info] Excluded resource: %v (%v)", datasetID, c.Name())
+			// This datasetID is excluded from deletion, returning
 			return false
 		}
 

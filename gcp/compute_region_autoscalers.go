@@ -5,10 +5,10 @@ import (
 	"log"
 	"sync"
 	"time"
- 
-	"golang.org/x/exp/slices"
+
 	"github.com/BESTSELLER/gcp-nuke/config"
 	"github.com/BESTSELLER/gcp-nuke/helpers"
+	"golang.org/x/exp/slices"
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sync/syncmap"
 	"google.golang.org/api/compute/v1"
@@ -89,10 +89,11 @@ func (c *ComputeRegionAutoScalers) Remove() error {
 		instanceID := key.(string)
 		region := value.(DefaultResourceProperties).region
 
-    // Check if a resource is exclued from deletion
-  	if slices.Contains(c.base.config.Exclusions.ComputeRegionAutoscaler, instanceID) {
-  		// This instanceID is excluded from deletion, returning
-  		return false
+		// Check if a resource is exclued from deletion
+		if slices.Contains(c.base.config.Exclusions.ComputeRegionAutoscaler, instanceID) {
+			log.Printf("[Info] Excluded resource: %v (%v)", instanceID, c.Name())
+			// This instanceID is excluded from deletion, returning
+			return false
 		}
 
 		// Parallel instance deletion
