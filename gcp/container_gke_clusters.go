@@ -7,9 +7,9 @@ import (
 	"sync"
 	"time"
 
-  "golang.org/x/exp/slices"
 	"github.com/BESTSELLER/gcp-nuke/config"
 	"github.com/BESTSELLER/gcp-nuke/helpers"
+	"golang.org/x/exp/slices"
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sync/syncmap"
 	"google.golang.org/api/container/v1"
@@ -90,10 +90,11 @@ func (c *ContainerGKEClusters) Remove() error {
 		instanceID := key.(string)
 		location := strings.Split(instanceID, "/")[3]
 
-    // Check if a resource is exclued from deletion
-  	if slices.Contains(c.base.config.Exclusions.ContainerGKECluster, instanceID) {
-  		// This instanceID is excluded from deletion, returning
-  		return false
+		// Check if a resource is exclued from deletion
+		if slices.Contains(c.base.config.Exclusions.ContainerGKECluster, instanceID) {
+			log.Printf("[Info] Excluded resource: %v (%v)", instanceID, c.Name())
+			// This instanceID is excluded from deletion, returning
+			return false
 		}
 
 		// Parallel instance deletion

@@ -6,9 +6,9 @@ import (
 	"sync"
 	"time"
 
- 	"golang.org/x/exp/slices"
 	"github.com/BESTSELLER/gcp-nuke/config"
 	"github.com/BESTSELLER/gcp-nuke/helpers"
+	"golang.org/x/exp/slices"
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sync/syncmap"
 	"google.golang.org/api/compute/v1"
@@ -86,9 +86,10 @@ func (c *ComputeFirewalls) Remove() error {
 	c.resourceMap.Range(func(key, value interface{}) bool {
 		firewallID := key.(string)
 
-  	// Check if resource is excluded
+		// Check if resource is excluded
 		if slices.Contains(c.base.config.Exclusions.ComputeFirewall, firewallID) {
-   		// Resource is excluded, skip deleting
+			log.Printf("[Info] Excluded resource: %v (%v)", firewallID, c.Name())
+			// Resource is excluded, skip deleting
 			return false
 		}
 
