@@ -6,9 +6,9 @@ import (
 	"sync"
 	"time"
 
- 	"golang.org/x/exp/slices"
 	"github.com/BESTSELLER/gcp-nuke/config"
 	"github.com/BESTSELLER/gcp-nuke/helpers"
+	"golang.org/x/exp/slices"
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sync/syncmap"
 	"google.golang.org/api/compute/v1"
@@ -87,10 +87,11 @@ func (c *ComputeVPNGateways) Remove() error {
 		gatewayID := key.(string)
 		region := value.(string)
 
-    // Check if a resource is exclued from deletion
-  	if slices.Contains(c.base.config.Exclusions.ComputeVPNGateway, gatewayID) {
-  		// This instanceID is excluded from deletion, returning
-  		return false
+		// Check if a resource is exclued from deletion
+		if slices.Contains(c.base.config.Exclusions.ComputeVPNGateway, gatewayID) {
+			log.Printf("[Info] Excluded resource: %v (%v)", gatewayID, c.Name())
+			// This instanceID is excluded from deletion, returning
+			return false
 		}
 
 		// Parallel gateway deletion

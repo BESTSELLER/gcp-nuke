@@ -6,9 +6,9 @@ import (
 	"sync"
 	"time"
 
-	"golang.org/x/exp/slices"
 	"github.com/BESTSELLER/gcp-nuke/config"
 	"github.com/BESTSELLER/gcp-nuke/helpers"
+	"golang.org/x/exp/slices"
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sync/syncmap"
 	"google.golang.org/api/compute/v1"
@@ -90,11 +90,12 @@ func (c *ComputeNetworkPeerings) Remove() error {
 		networkID := value.(string)
 
 		// Check if a resource is exclued from deletion
-    if slices.Contains(c.base.config.Exclusions.ComputeNetworkPeering, networkPeeringID) {
-  		// This instanceID is excluded from deletion, returning
-  		return false
+		if slices.Contains(c.base.config.Exclusions.ComputeNetworkPeering, networkID) {
+			log.Printf("[Info] Excluded resource: %v (%v)", networkID, c.Name())
+			// This instanceID is excluded from deletion, returning
+			return false
 		}
-		
+
 		// Parallel network deletion
 		errs.Go(func() error {
 
