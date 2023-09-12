@@ -26,7 +26,7 @@ NAME:
    gcp-nuke - The GCP project cleanup tool with added radiation
 
 USAGE:
-   e.g. gcp-nuke --project test-nuke-123456 --dryrun
+   e.g. gcp-nuke --project test-nuke-262510 --dryrun
 
 VERSION:
    v0.1.0
@@ -35,15 +35,16 @@ COMMANDS:
    help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --project value   GCP project id to nuke (required)
-   --dryrun          Perform a dryrun instead (default: false)
-   --timeout value   Timeout for removal of a single resource in seconds (default: 400)
-   --polltime value  Time for polling resource deletion status in seconds (default: 10)
-   --help, -h        show help (default: false)
-   --version, -v     print the version (default: false)
+   --project value                       GCP project id to nuke (required)
+   --dryrun                              Perform a dryrun instead (default: false)
+   --timeout value                       Timeout for removal of a single resource in seconds (default: 400)
+   --polltime value                      Time for polling resource deletion status in seconds (default: 10)
+   --exclusionsconfig value, --ec value  Path to exclusions config file [$EXCLUSIONS_CONFIG]
+   --help, -h                            show help
+   --version, -v                         print the version
 ```
 
-Example dryrun
+### Example dryrun
 
 ```
 ./gcp-nuke --project test-nuke-123456 --dryrun
@@ -67,6 +68,28 @@ Example dryrun
 2019/12/23 13:53:32 [Dryrun] [Skip] Resource type ComputeDisks has nothing to destroy [project: test-nuke-123456]
 2019/12/23 13:53:33 [Dryrun] Resource type ComputeInstanceGroupsZone with resources [instance-group-1] would be destroyed [project: test-nuke-123456]
 2019/12/23 13:53:33 -- Deletion complete for project test-nuke-123456 (dry-run: true) --
+```
+
+### Example config file
+```json
+{
+  "bigquery": [],
+  "compute_disk": [],
+  "compute_firewall": [],
+  "compute_instance_groups_region": [],
+  "compute_instance_groups_zone": [],
+  "compute_instance": [], 
+  "compute_network_peering": [],
+  "compute_region_autoscaler": [],
+  "compute_router": [],
+  "compute_subnetwork": [],
+  "compute_vpn_gateway": [],
+  "compute_vpn_tunnel": [],
+  "compute_zone_autoscaler": [],
+  "container_gke_cluster": [],
+  "google_compute_network": [],
+  "iam_service_account": []
+}
 ```
 
 ## Roadmap

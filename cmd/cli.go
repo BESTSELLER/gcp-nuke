@@ -38,7 +38,7 @@ func Command() {
 				Usage: "Time for polling resource deletion status in seconds",
 			},
 			&cli.StringFlag{
-				Name:    "ExclusionsConfig, ec",
+				Name:    "exclusionsconfig, ec",
 				Usage:   "Path to exclusions config file",
 				EnvVars: []string{"EXCLUSIONS_CONFIG"},
 				Aliases: []string{"ec"},
@@ -57,22 +57,21 @@ func Command() {
 				Regions:  gcp.GetRegions(gcp.Ctx, c.String("project")),
 			}
 
-			if c.String("ExclusionsConfig") != "" {
+			if c.String("exclusionsconfig") != "" {
 				// Read exclusions config file and marshall into Config.Exclusions struct
-				var exclusions config.Exclusions
 
-				b, err := os.ReadFile(c.String("ExclusionsConfig"))
+				b, err := os.ReadFile(c.String("exclusionsconfig"))
 				if err != nil {
-					log.Printf("[Error] Exclusions config file not found at %v", c.String("ExclusionsConfig"))
+					log.Printf("[Error] Exclusions config file not found at %v", c.String("exclusionsconfig"))
 					return err
 				}
 
-				err = json.Unmarshal(b, &exclusions)
+				err = json.Unmarshal(b, &config.Exclusions)
 				if err != nil {
 					log.Printf("[Error] Exclusions config file could not be parsed")
 				}
 
-				config.Exclusions = exclusions
+				log.Printf("Loaded exclusions config: %+v", config.Exclusions)
 			}
 
 			log.Printf("[Info] Timeout %v seconds. Polltime %v seconds. Dry run: %v", config.Timeout, config.PollTime, config.DryRun)
