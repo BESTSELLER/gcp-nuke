@@ -6,7 +6,7 @@ require (
 	cloud.google.com/go/bigquery v1.62.0
 	github.com/urfave/cli/v2 v2.27.4
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
-	golang.org/x/oauth2 v0.21.0
+	golang.org/x/oauth2 v0.22.0
 	golang.org/x/sync v0.8.0
 	google.golang.org/api v0.190.0
 )
