@@ -12,6 +12,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sync/syncmap"
 	"google.golang.org/api/compute/v1"
+	"google.golang.org/api/option"
 )
 
 // ComputeNetworkPeerings -
@@ -19,17 +20,6 @@ type ComputeNetworkPeerings struct {
 	serviceClient *compute.Service
 	base          ResourceBase
 	resourceMap   syncmap.Map
-}
-
-func init() {
-	computeService, err := compute.NewService(Ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-	computeResource := ComputeNetworkPeerings{
-		serviceClient: computeService,
-	}
-	register(&computeResource)
 }
 
 // Name - Name of the resourceLister for ComputeNetworkPeerings
@@ -40,13 +30,20 @@ func (c *ComputeNetworkPeerings) Name() string {
 // ToSlice - Name of the resourceLister for ComputeNetworkPeerings
 func (c *ComputeNetworkPeerings) ToSlice() (slice []string) {
 	return helpers.SortedSyncMapKeys(&c.resourceMap)
-
 }
 
 // Setup - populates the struct
 func (c *ComputeNetworkPeerings) Setup(config config.Config) {
 	c.base.config = config
 
+	computeService, err := compute.NewService(Ctx, option.WithTokenSource(config.GCPToken))
+	if err != nil {
+		log.Fatal(err)
+	}
+	computeResource := ComputeNetworkPeerings{
+		serviceClient: computeService,
+	}
+	register(&computeResource)
 }
 
 // List - Returns a list of all ComputeNetworkPeerings
@@ -81,7 +78,6 @@ func (c *ComputeNetworkPeerings) Dependencies() []string {
 
 // Remove -
 func (c *ComputeNetworkPeerings) Remove() error {
-
 	// Removal logic
 	errs, _ := errgroup.WithContext(c.base.config.Context)
 
@@ -98,7 +94,6 @@ func (c *ComputeNetworkPeerings) Remove() error {
 
 		// Parallel network deletion
 		errs.Go(func() error {
-
 			deleteCall := c.serviceClient.Networks.RemovePeering(c.base.config.Project, networkID, &compute.NetworksRemovePeeringRequest{
 				Name: networkPeeringID,
 			})

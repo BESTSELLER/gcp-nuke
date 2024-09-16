@@ -13,6 +13,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sync/syncmap"
 	"google.golang.org/api/compute/v1"
+	"google.golang.org/api/option"
 )
 
 // ComputeInstances -
@@ -20,17 +21,6 @@ type ComputeInstances struct {
 	serviceClient *compute.Service
 	base          ResourceBase
 	resourceMap   syncmap.Map
-}
-
-func init() {
-	computeService, err := compute.NewService(Ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-	computeResource := ComputeInstances{
-		serviceClient: computeService,
-	}
-	register(&computeResource)
 }
 
 // Name - Name of the resourceLister for ComputeInstances
@@ -41,13 +31,20 @@ func (c *ComputeInstances) Name() string {
 // ToSlice - Name of the resourceLister for ComputeInstances
 func (c *ComputeInstances) ToSlice() (slice []string) {
 	return helpers.SortedSyncMapKeys(&c.resourceMap)
-
 }
 
 // Setup - populates the struct
 func (c *ComputeInstances) Setup(config config.Config) {
 	c.base.config = config
 
+	computeService, err := compute.NewService(Ctx, option.WithTokenSource(config.GCPToken))
+	if err != nil {
+		log.Fatal(err)
+	}
+	computeResource := ComputeInstances{
+		serviceClient: computeService,
+	}
+	register(&computeResource)
 }
 
 // List - Returns a list of all ComputeInstances
@@ -93,7 +90,6 @@ func (c *ComputeInstances) Dependencies() []string {
 
 // Remove -
 func (c *ComputeInstances) Remove() error {
-
 	// Removal logic
 	errs, _ := errgroup.WithContext(c.base.config.Context)
 
