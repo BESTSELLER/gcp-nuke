@@ -11,7 +11,6 @@ import (
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sync/syncmap"
 	"google.golang.org/api/iam/v1"
-	"google.golang.org/api/option"
 )
 
 type IAMServiceAccount struct {
@@ -21,18 +20,9 @@ type IAMServiceAccount struct {
 	TopicIDs      []string
 }
 
-func (c *IAMServiceAccount) Name() string {
-	return "IAMServiceAccount"
-}
+func init() {
 
-func (c *IAMServiceAccount) ToSlice() (slice []string) {
-	return helpers.SortedSyncMapKeys(&c.resourceMap)
-}
-
-func (c *IAMServiceAccount) Setup(config config.Config) {
-	c.base.config = config
-
-	iamService, err := iam.NewService(Ctx, option.WithTokenSource(config.GCPToken))
+	iamService, err := iam.NewService(Ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -41,6 +31,19 @@ func (c *IAMServiceAccount) Setup(config config.Config) {
 		serviceClient: iamService,
 	}
 	register(&iamResource)
+}
+
+func (c *IAMServiceAccount) Name() string {
+	return "IAMServiceAccount"
+}
+
+func (c *IAMServiceAccount) ToSlice() (slice []string) {
+	return helpers.SortedSyncMapKeys(&c.resourceMap)
+
+}
+
+func (c *IAMServiceAccount) Setup(config config.Config) {
+	c.base.config = config
 }
 
 func (c *IAMServiceAccount) List(refreshCache bool) []string {
@@ -60,6 +63,7 @@ func (c *IAMServiceAccount) List(refreshCache bool) []string {
 		if strings.Contains(serviceAccount.Email, c.base.config.Project) {
 			c.resourceMap.Store(serviceAccount.DisplayName, serviceAccount.Email)
 		}
+
 	}
 
 	return c.ToSlice()
@@ -86,6 +90,7 @@ func (c *IAMServiceAccount) Remove() error {
 
 		// Parallel instance deletion
 		errs.Go(func() error {
+
 			_, err := c.serviceClient.Projects.ServiceAccounts.Delete("projects/" + c.base.config.Project + "/serviceAccounts/" + emailAddress).Do()
 			if err != nil {
 				return err

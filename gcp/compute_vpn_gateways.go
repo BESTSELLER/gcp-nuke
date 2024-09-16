@@ -12,7 +12,6 @@ import (
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sync/syncmap"
 	"google.golang.org/api/compute/v1"
-	"google.golang.org/api/option"
 )
 
 // ComputeVPNGateways -
@@ -20,6 +19,17 @@ type ComputeVPNGateways struct {
 	serviceClient *compute.Service
 	base          ResourceBase
 	resourceMap   syncmap.Map
+}
+
+func init() {
+	computeService, err := compute.NewService(Ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	computeResource := ComputeVPNGateways{
+		serviceClient: computeService,
+	}
+	register(&computeResource)
 }
 
 // Name - Name of the resourceLister for ComputeVPNGateways
@@ -30,20 +40,13 @@ func (c *ComputeVPNGateways) Name() string {
 // ToSlice - Name of the resourceLister for ComputeVPNGateways
 func (c *ComputeVPNGateways) ToSlice() (slice []string) {
 	return helpers.SortedSyncMapKeys(&c.resourceMap)
+
 }
 
 // Setup - populates the struct
 func (c *ComputeVPNGateways) Setup(config config.Config) {
 	c.base.config = config
 
-	computeService, err := compute.NewService(Ctx, option.WithTokenSource(config.GCPToken))
-	if err != nil {
-		log.Fatal(err)
-	}
-	computeResource := ComputeVPNGateways{
-		serviceClient: computeService,
-	}
-	register(&computeResource)
 }
 
 // List - Returns a list of all ComputeVPNGateways
@@ -76,6 +79,7 @@ func (c *ComputeVPNGateways) Dependencies() []string {
 
 // Remove -
 func (c *ComputeVPNGateways) Remove() error {
+
 	// Removal logic
 	errs, _ := errgroup.WithContext(c.base.config.Context)
 

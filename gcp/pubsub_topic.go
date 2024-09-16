@@ -9,7 +9,6 @@ import (
 	"github.com/BESTSELLER/gcp-nuke/helpers"
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sync/syncmap"
-	"google.golang.org/api/option"
 	"google.golang.org/api/pubsub/v1"
 )
 
@@ -20,18 +19,9 @@ type PubSubTopic struct {
 	TopicIDs      []string
 }
 
-func (c *PubSubTopic) Name() string {
-	return "PubSubTopic"
-}
+func init() {
 
-func (c *PubSubTopic) ToSlice() (slice []string) {
-	return helpers.SortedSyncMapKeys(&c.resourceMap)
-}
-
-func (c *PubSubTopic) Setup(config config.Config) {
-	c.base.config = config
-
-	pubsubService, err := pubsub.NewService(Ctx, option.WithTokenSource(config.GCPToken))
+	pubsubService, err := pubsub.NewService(Ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -40,6 +30,19 @@ func (c *PubSubTopic) Setup(config config.Config) {
 		serviceClient: pubsubService,
 	}
 	register(&pubsubResource)
+}
+
+func (c *PubSubTopic) Name() string {
+	return "PubSubTopic"
+}
+
+func (c *PubSubTopic) ToSlice() (slice []string) {
+	return helpers.SortedSyncMapKeys(&c.resourceMap)
+
+}
+
+func (c *PubSubTopic) Setup(config config.Config) {
+	c.base.config = config
 }
 
 func (c *PubSubTopic) List(refreshCache bool) []string {
@@ -56,6 +59,7 @@ func (c *PubSubTopic) List(refreshCache bool) []string {
 
 	for _, topic := range topicList.Topics {
 		c.resourceMap.Store(topic.Name, topic.Name)
+
 	}
 
 	return c.ToSlice()
@@ -76,6 +80,7 @@ func (c *PubSubTopic) Remove() error {
 		// location := strings.Split(datasetID, "/")[3]
 		// Parallel instance deletion
 		errs.Go(func() error {
+
 			_, err := c.serviceClient.Projects.Topics.Delete(topicID).Context(Ctx).Do()
 			if err != nil {
 				return err
