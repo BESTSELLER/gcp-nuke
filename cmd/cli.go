@@ -61,10 +61,12 @@ func Command() {
 				Timeout:  c.Int("timeout"),
 				PollTime: c.Int("polltime"),
 				Context:  gcp.Ctx,
-				Zones:    gcp.GetZones(gcp.Ctx, c.String("project")),
-				Regions:  gcp.GetRegions(gcp.Ctx, c.String("project")),
+				// Zones:    gcp.GetZones(gcp.Ctx, c.String("project")),
+				// Regions:  gcp.GetRegions(gcp.Ctx, c.String("project")),
 				GCPToken: token,
 			}
+			gcp.AddZonesToConfig(gcp.Ctx, c.String("project"), &config)
+			gcp.AddRegionsToConfig(gcp.Ctx, c.String("project"), &config)
 
 			if c.String("exclusionsconfig") != "" {
 				// Read exclusions config file and marshall into Config.Exclusions struct
