@@ -8,6 +8,7 @@ import (
 	"github.com/BESTSELLER/gcp-nuke/config"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/compute/v1"
+	"google.golang.org/api/option"
 )
 
 // ResourceBase -
@@ -33,8 +34,10 @@ type Resource interface {
 }
 
 // Ctx = context
-var Ctx = context.Background()
-var resourceMap = make(map[string]Resource)
+var (
+	Ctx         = context.Background()
+	resourceMap = make(map[string]Resource)
+)
 
 func register(resource Resource) {
 	_, exists := resourceMap[resource.Name()]
@@ -60,7 +63,7 @@ func GetZones(defaultContext context.Context, project string) []string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	serviceClient, err := compute.New(client)
+	serviceClient, err := compute.NewService(client)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -76,6 +79,22 @@ func GetZones(defaultContext context.Context, project string) []string {
 		zoneStringSlice = append(zoneStringSlice, zoneNameSplit[len(zoneNameSplit)-1])
 	}
 	return zoneStringSlice
+}
+
+func AddZonesToConfig(defaultContext context.Context, project string, config *config.Config) {
+	computeService, err := compute.NewService(defaultContext, option.WithTokenSource(config.GCPToken))
+	if err != nil {
+		log.Fatal(err)
+	}
+	zones, err := computeService.Zones.List(project).Do()
+	if err != nil {
+		log.Fatal(err)
+	}
+	config.Zones = []string{}
+	for _, zone := range zones.Items {
+		zoneNameSplit := strings.Split(zone.Name, "/")
+		config.Zones = append(config.Zones, zoneNameSplit[len(zoneNameSplit)-1])
+	}
 }
 
 // GetRegions -
@@ -101,6 +120,22 @@ func GetRegions(defaultContext context.Context, project string) []string {
 		regionStringSlice = append(regionStringSlice, regionNameSplit[len(regionNameSplit)-1])
 	}
 	return regionStringSlice
+}
+
+func AddRegionsToConfig(defaultContext context.Context, project string, config *config.Config) {
+	computeService, err := compute.NewService(defaultContext, option.WithTokenSource(config.GCPToken))
+	if err != nil {
+		log.Fatal(err)
+	}
+	regions, err := computeService.Regions.List(project).Do()
+	if err != nil {
+		log.Fatal(err)
+	}
+	config.Regions = []string{}
+	for _, region := range regions.Items {
+		regionNameSplit := strings.Split(region.Name, "/")
+		config.Regions = append(config.Regions, regionNameSplit[len(regionNameSplit)-1])
+	}
 }
 
 func extractGKESelfLink(input string) string {
