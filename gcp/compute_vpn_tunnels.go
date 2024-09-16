@@ -12,6 +12,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sync/syncmap"
 	"google.golang.org/api/compute/v1"
+	"google.golang.org/api/option"
 )
 
 // ComputeVPNTunnels -
@@ -19,17 +20,6 @@ type ComputeVPNTunnels struct {
 	serviceClient *compute.Service
 	base          ResourceBase
 	resourceMap   syncmap.Map
-}
-
-func init() {
-	computeService, err := compute.NewService(Ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-	computeResource := ComputeVPNTunnels{
-		serviceClient: computeService,
-	}
-	register(&computeResource)
 }
 
 // Name - Name of the resourceLister for ComputeVPNTunnels
@@ -40,13 +30,20 @@ func (c *ComputeVPNTunnels) Name() string {
 // ToSlice - Name of the resourceLister for ComputeVPNTunnels
 func (c *ComputeVPNTunnels) ToSlice() (slice []string) {
 	return helpers.SortedSyncMapKeys(&c.resourceMap)
-
 }
 
 // Setup - populates the struct
 func (c *ComputeVPNTunnels) Setup(config config.Config) {
 	c.base.config = config
 
+	computeService, err := compute.NewService(Ctx, option.WithTokenSource(config.GCPToken))
+	if err != nil {
+		log.Fatal(err)
+	}
+	computeResource := ComputeVPNTunnels{
+		serviceClient: computeService,
+	}
+	register(&computeResource)
 }
 
 // List - Returns a list of all ComputeVPNTunnels
@@ -78,7 +75,6 @@ func (c *ComputeVPNTunnels) Dependencies() []string {
 
 // Remove -
 func (c *ComputeVPNTunnels) Remove() error {
-
 	// Removal logic
 	errs, _ := errgroup.WithContext(c.base.config.Context)
 

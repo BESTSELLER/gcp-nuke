@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 
@@ -12,7 +13,6 @@ import (
 
 // Command -
 func Command() {
-
 	app := &cli.App{
 		Usage:     "The GCP project cleanup tool with added radiation",
 		Version:   "v0.1.0",
@@ -43,9 +43,17 @@ func Command() {
 				EnvVars: []string{"EXCLUSIONS_CONFIG"},
 				Aliases: []string{"ec"},
 			},
+			&cli.StringFlag{
+				Name:    "gcpaccesstoken",
+				Usage:   "GCP token for authentication",
+				EnvVars: []string{"GCP_ACCESS_TOKEN"},
+			},
 		},
 		Action: func(c *cli.Context) error {
-
+			if c.String("gcpaccesstoken") == "" {
+				return fmt.Errorf("GCP Access Token not provided")
+			}
+			token := config.ConvertStringToTokenSource(c.String("gcptoken"))
 			// Behaviour to delete all resource in parallel in one project at a time - will be made into loop / concurrenct project nuke if required
 			config := config.Config{
 				Project:  c.String("project"),
@@ -55,6 +63,7 @@ func Command() {
 				Context:  gcp.Ctx,
 				Zones:    gcp.GetZones(gcp.Ctx, c.String("project")),
 				Regions:  gcp.GetRegions(gcp.Ctx, c.String("project")),
+				GCPToken: token,
 			}
 
 			if c.String("exclusionsconfig") != "" {
