@@ -42,6 +42,7 @@ GLOBAL OPTIONS:
    --exclusionsconfig value, --ec value  Path to exclusions config file [$EXCLUSIONS_CONFIG]
    --help, -h                            show help
    --version, -v                         print the version
+   --gcpaccesstoken                      Access token to use
 ```
 
 ### Example dryrun
