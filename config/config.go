@@ -2,8 +2,6 @@ package config
 
 import (
 	"context"
-
-	"golang.org/x/oauth2"
 )
 
 // Config -
@@ -16,7 +14,6 @@ type Config struct {
 	Context    context.Context
 	DryRun     bool
 	Exclusions Exclusions
-	GCPToken   oauth2.TokenSource
 }
 
 type Exclusions struct {
@@ -37,8 +34,4 @@ type Exclusions struct {
 	ContainerGKECluster         []string `json:"container_gke_cluster"`
 	GoogleComputeNetwork        []string `json:"google_compute_network"`
 	IAMServiceAccount           []string `json:"iam_service_account"`
-}
-
-func ConvertStringToTokenSource(token string) oauth2.TokenSource {
-	return oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
 }

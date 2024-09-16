@@ -13,7 +13,6 @@ import (
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sync/syncmap"
 	"google.golang.org/api/compute/v1"
-	"google.golang.org/api/option"
 )
 
 // ComputeInstanceGroupsZone -
@@ -25,6 +24,17 @@ type ComputeInstanceGroupsZone struct {
 	resourceMap       syncmap.Map
 }
 
+func init() {
+	computeService, err := compute.NewService(Ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	computeResource := ComputeInstanceGroupsZone{
+		serviceClient: computeService,
+	}
+	register(&computeResource)
+}
+
 // Name - Name of the resourceLister for ComputeInstanceGroupsZone
 func (c *ComputeInstanceGroupsZone) Name() string {
 	return "ComputeInstanceGroupsZone"
@@ -33,20 +43,12 @@ func (c *ComputeInstanceGroupsZone) Name() string {
 // ToSlice - Name of the resourceLister for ComputeInstanceGroupsZone
 func (c *ComputeInstanceGroupsZone) ToSlice() (slice []string) {
 	return helpers.SortedSyncMapKeys(&c.resourceMap)
+
 }
 
 // Setup - populates the struct
 func (c *ComputeInstanceGroupsZone) Setup(config config.Config) {
 	c.base.config = config
-
-	computeService, err := compute.NewService(Ctx, option.WithTokenSource(config.GCPToken))
-	if err != nil {
-		log.Fatal(err)
-	}
-	computeResource := ComputeInstanceGroupsZone{
-		serviceClient: computeService,
-	}
-	register(&computeResource)
 
 	// Get the node pool list with some reflection rather than re-instantiating
 	a := ContainerGKEClusters{}
@@ -95,6 +97,7 @@ func (c *ComputeInstanceGroupsZone) Dependencies() []string {
 
 // Remove -
 func (c *ComputeInstanceGroupsZone) Remove() error {
+
 	// Removal logic
 	errs, _ := errgroup.WithContext(c.base.config.Context)
 

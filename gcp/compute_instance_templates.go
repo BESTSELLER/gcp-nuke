@@ -12,7 +12,6 @@ import (
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sync/syncmap"
 	"google.golang.org/api/compute/v1"
-	"google.golang.org/api/option"
 )
 
 // ComputeInstanceTemplates -
@@ -20,6 +19,17 @@ type ComputeInstanceTemplates struct {
 	serviceClient *compute.Service
 	base          ResourceBase
 	resourceMap   syncmap.Map
+}
+
+func init() {
+	computeService, err := compute.NewService(Ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	computeResource := ComputeInstanceTemplates{
+		serviceClient: computeService,
+	}
+	register(&computeResource)
 }
 
 // Name - Name of the resourceLister for ComputeInstanceTemplates
@@ -30,20 +40,13 @@ func (c *ComputeInstanceTemplates) Name() string {
 // ToSlice - Name of the resourceLister for ComputeInstanceTemplates
 func (c *ComputeInstanceTemplates) ToSlice() (slice []string) {
 	return helpers.SortedSyncMapKeys(&c.resourceMap)
+
 }
 
 // Setup - populates the struct
 func (c *ComputeInstanceTemplates) Setup(config config.Config) {
 	c.base.config = config
 
-	computeService, err := compute.NewService(Ctx, option.WithTokenSource(config.GCPToken))
-	if err != nil {
-		log.Fatal(err)
-	}
-	computeResource := ComputeInstanceTemplates{
-		serviceClient: computeService,
-	}
-	register(&computeResource)
 }
 
 // List - Returns a list of all ComputeInstanceTemplates
@@ -77,6 +80,7 @@ func (c *ComputeInstanceTemplates) Dependencies() []string {
 
 // Remove -
 func (c *ComputeInstanceTemplates) Remove() error {
+
 	// Removal logic
 	errs, _ := errgroup.WithContext(c.base.config.Context)
 

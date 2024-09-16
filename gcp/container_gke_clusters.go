@@ -13,7 +13,6 @@ import (
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sync/syncmap"
 	"google.golang.org/api/container/v1"
-	"google.golang.org/api/option"
 )
 
 // ContainerGKEClusters -
@@ -24,6 +23,17 @@ type ContainerGKEClusters struct {
 	InstanceGroups []string
 }
 
+func init() {
+	containerService, err := container.NewService(Ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	containerResource := ContainerGKEClusters{
+		serviceClient: containerService,
+	}
+	register(&containerResource)
+}
+
 // Name - Name of the resourceLister for ContainerGKEClusters
 func (c *ContainerGKEClusters) Name() string {
 	return "ContainerGKEClusters"
@@ -32,20 +42,13 @@ func (c *ContainerGKEClusters) Name() string {
 // ToSlice - Name of the resourceLister for ContainerGKEClusters
 func (c *ContainerGKEClusters) ToSlice() (slice []string) {
 	return helpers.SortedSyncMapKeys(&c.resourceMap)
+
 }
 
 // Setup - populates the struct
 func (c *ContainerGKEClusters) Setup(config config.Config) {
 	c.base.config = config
 
-	containerService, err := container.NewService(Ctx, option.WithTokenSource(config.GCPToken))
-	if err != nil {
-		log.Fatal(err)
-	}
-	containerResource := ContainerGKEClusters{
-		serviceClient: containerService,
-	}
-	register(&containerResource)
 }
 
 // List - Returns a list of all ContainerGKEClusters
@@ -79,6 +82,7 @@ func (c *ContainerGKEClusters) Dependencies() []string {
 
 // Remove -
 func (c *ContainerGKEClusters) Remove() error {
+
 	// Removal logic
 	errs, _ := errgroup.WithContext(c.base.config.Context)
 
