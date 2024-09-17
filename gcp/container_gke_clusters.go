@@ -40,7 +40,7 @@ func (c *ContainerGKEClusters) Setup(config config.Config) {
 
 	containerService, err := container.NewService(Ctx, option.WithTokenSource(config.GCPToken))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("ContainerGKEClusters.Setup.NewService: %s", err)
 	}
 	containerResource := ContainerGKEClusters{
 		serviceClient: containerService,
@@ -59,7 +59,7 @@ func (c *ContainerGKEClusters) List(refreshCache bool) []string {
 	instanceListCall := c.serviceClient.Projects.Locations.Clusters.List(fmt.Sprintf("projects/%v/locations/-", c.base.config.Project))
 	instanceList, err := instanceListCall.Do()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("ContainerGKEClusters.List: %s", err)
 	}
 
 	for _, instance := range instanceList.Clusters {
@@ -135,7 +135,7 @@ func (c *ContainerGKEClusters) appendInstanceGroups(clusterName, clusterLocation
 	nodePoolCall := c.serviceClient.Projects.Locations.Clusters.NodePools.List(parentLocation)
 	nodePools, err := nodePoolCall.Do()
 	if err != nil {
-		log.Fatal((err))
+		log.Fatalf("ContainerGKEClusters.appendInstanceGroups.NodePools.List: %s", err)
 	}
 	for _, nodePool := range nodePools.NodePools {
 		for _, instanceGroupURL := range nodePool.InstanceGroupUrls {

@@ -33,7 +33,7 @@ func (c *PubSubTopic) Setup(config config.Config) {
 
 	pubsubService, err := pubsub.NewService(Ctx, option.WithTokenSource(config.GCPToken))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("PubSubTopic.Setup.NewService: %s", err)
 	}
 
 	pubsubResource := PubSubTopic{
@@ -51,7 +51,7 @@ func (c *PubSubTopic) List(refreshCache bool) []string {
 
 	topicList, err := c.serviceClient.Projects.Topics.List("projects/" + c.base.config.Project).Context(Ctx).Do()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("PubSubTopic.List: %s", err)
 	}
 
 	for _, topic := range topicList.Topics {

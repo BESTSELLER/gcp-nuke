@@ -39,7 +39,7 @@ func (c *ComputeInstances) Setup(config config.Config) {
 
 	computeService, err := compute.NewService(Ctx, option.WithTokenSource(config.GCPToken))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("ComputeInstances.Setup.NewService: %s", err)
 	}
 	computeResource := ComputeInstances{
 		serviceClient: computeService,
@@ -59,7 +59,7 @@ func (c *ComputeInstances) List(refreshCache bool) []string {
 		instanceListCall := c.serviceClient.Instances.List(c.base.config.Project, zone)
 		instanceList, err := instanceListCall.Do()
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("ComputeInstances.List: %s", err)
 		}
 
 		for _, instance := range instanceList.Items {

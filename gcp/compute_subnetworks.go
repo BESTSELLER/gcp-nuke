@@ -38,7 +38,7 @@ func (c *ComputeSubnetworks) Setup(config config.Config) {
 
 	computeService, err := compute.NewService(Ctx, option.WithTokenSource(config.GCPToken))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("ComputeSubnetworks.Setup.NewService: %s", err)
 	}
 	computeResource := ComputeSubnetworks{
 		serviceClient: computeService,
@@ -58,7 +58,7 @@ func (c *ComputeSubnetworks) List(refreshCache bool) []string {
 		subnetworkListCall := c.serviceClient.Subnetworks.List(c.base.config.Project, region)
 		subnetworkList, err := subnetworkListCall.Do()
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("ComputeSubnetworks.List: %s", err)
 		}
 
 		for _, subnetwork := range subnetworkList.Items {

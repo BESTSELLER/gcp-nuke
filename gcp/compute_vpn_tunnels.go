@@ -38,7 +38,7 @@ func (c *ComputeVPNTunnels) Setup(config config.Config) {
 
 	computeService, err := compute.NewService(Ctx, option.WithTokenSource(config.GCPToken))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("ComputeVPNTunnels.Setup.NewService: %s", err)
 	}
 	computeResource := ComputeVPNTunnels{
 		serviceClient: computeService,
@@ -58,7 +58,7 @@ func (c *ComputeVPNTunnels) List(refreshCache bool) []string {
 		tunnelListCall := c.serviceClient.VpnTunnels.List(c.base.config.Project, region)
 		tunnelList, err := tunnelListCall.Do()
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("ComputeVPNTunnels.List: %s", err)
 		}
 
 		for _, tunnel := range tunnelList.Items {

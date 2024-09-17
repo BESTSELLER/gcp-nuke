@@ -38,7 +38,7 @@ func (c *ComputeFirewalls) Setup(config config.Config) {
 
 	computeService, err := compute.NewService(Ctx, option.WithTokenSource(config.GCPToken))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("ComputeFirewalls.Setup.NewService: %s", err)
 	}
 	computeResource := ComputeFirewalls{
 		serviceClient: computeService,
@@ -57,7 +57,7 @@ func (c *ComputeFirewalls) List(refreshCache bool) []string {
 	firewallListCall := c.serviceClient.Firewalls.List(c.base.config.Project)
 	firewallList, err := firewallListCall.Do()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("ComputeFirewalls.List: %s", err)
 	}
 
 	for _, firewall := range firewallList.Items {

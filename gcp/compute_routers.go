@@ -38,7 +38,7 @@ func (c *ComputeRouters) Setup(config config.Config) {
 
 	computeService, err := compute.NewService(Ctx, option.WithTokenSource(config.GCPToken))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("ComputeRouters.Setup.NewService: %s", err)
 	}
 	computeResource := ComputeRouters{
 		serviceClient: computeService,
@@ -58,7 +58,7 @@ func (c *ComputeRouters) List(refreshCache bool) []string {
 		routerListCall := c.serviceClient.Routers.List(c.base.config.Project, region)
 		routerList, err := routerListCall.Do()
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("ComputeRouters.List: %s", err)
 		}
 
 		for _, router := range routerList.Items {

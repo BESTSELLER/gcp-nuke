@@ -35,7 +35,7 @@ func (c *BigQueryDataset) Setup(config config.Config) {
 
 	bigqueryService, err := bigquery.NewService(Ctx, option.WithTokenSource(config.GCPToken))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("BigQueryDataset.Setup.NewService: %s", err)
 	}
 
 	bigqueryResource := BigQueryDataset{
@@ -53,7 +53,7 @@ func (c *BigQueryDataset) List(refreshCache bool) []string {
 
 	datasetList, err := c.serviceClient.Datasets.List(c.base.config.Project).Context(Ctx).Do()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("BigQueryDataset.List: %s", err)
 	}
 
 	for _, dataset := range datasetList.Datasets {

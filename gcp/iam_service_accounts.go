@@ -34,7 +34,7 @@ func (c *IAMServiceAccount) Setup(config config.Config) {
 
 	iamService, err := iam.NewService(Ctx, option.WithTokenSource(config.GCPToken))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("IAMServiceAccount.Setup.NewService: %s", err)
 	}
 
 	iamResource := IAMServiceAccount{
@@ -52,7 +52,7 @@ func (c *IAMServiceAccount) List(refreshCache bool) []string {
 
 	serviceAccountList, err := c.serviceClient.Projects.ServiceAccounts.List("projects/" + c.base.config.Project).Do()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("IAMServiceAccount.List: %s", err)
 	}
 
 	for _, serviceAccount := range serviceAccountList.Accounts {

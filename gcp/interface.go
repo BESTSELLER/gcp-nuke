@@ -61,16 +61,16 @@ func GetZones(defaultContext context.Context, project string) []string {
 	log.Println("[Info] Retrieving zones for project:", project)
 	client, err := google.DefaultClient(defaultContext, compute.ComputeScope)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("GetZones.DefaultClient: %s", err)
 	}
 	serviceClient, err := compute.New(client)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("GetZones.serviceClient: %s", err)
 	}
 	zoneListCall := serviceClient.Zones.List(project)
 	zoneList, err := zoneListCall.Do()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("GetZones.Zones.List: %s", err)
 	}
 
 	zoneStringSlice := []string{}
@@ -84,11 +84,11 @@ func GetZones(defaultContext context.Context, project string) []string {
 func AddZonesToConfig(defaultContext context.Context, project string, config *config.Config) {
 	computeService, err := compute.NewService(defaultContext, option.WithTokenSource(config.GCPToken))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("AddZonesToConfig.NewService: %s", err)
 	}
 	zones, err := computeService.Zones.List(project).Do()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("AddZonesToConfig.List: %s", err)
 	}
 	config.Zones = []string{}
 	for _, zone := range zones.Items {
@@ -102,16 +102,16 @@ func GetRegions(defaultContext context.Context, project string) []string {
 	log.Println("[Info] Retrieving regions for project:", project)
 	client, err := google.DefaultClient(defaultContext, compute.ComputeScope)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("GetRegions.DefaultClient: %s", err)
 	}
 	serviceClient, err := compute.New(client)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("GetRegions.serviceClient: %s", err)
 	}
 	regionListCall := serviceClient.Regions.List(project)
 	regionList, err := regionListCall.Do()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("GetRegions.Regions.List: %s", err)
 	}
 
 	regionStringSlice := []string{}
@@ -125,11 +125,11 @@ func GetRegions(defaultContext context.Context, project string) []string {
 func AddRegionsToConfig(defaultContext context.Context, project string, config *config.Config) {
 	computeService, err := compute.NewService(defaultContext, option.WithTokenSource(config.GCPToken))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("AddRegionsToConfig.NewService: %s", err)
 	}
 	regions, err := computeService.Regions.List(project).Do()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("AddRegionsToConfig.List: %s", err)
 	}
 	config.Regions = []string{}
 	for _, region := range regions.Items {

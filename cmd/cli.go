@@ -94,6 +94,6 @@ func Command() {
 
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("app.Run: %s", err)
 	}
 }

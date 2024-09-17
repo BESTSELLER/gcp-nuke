@@ -38,7 +38,7 @@ func (c *ComputeInstanceTemplates) Setup(config config.Config) {
 
 	computeService, err := compute.NewService(Ctx, option.WithTokenSource(config.GCPToken))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("ComputeInstanceTemplates.Setup.NewService: %s", err)
 	}
 	computeResource := ComputeInstanceTemplates{
 		serviceClient: computeService,
@@ -57,7 +57,7 @@ func (c *ComputeInstanceTemplates) List(refreshCache bool) []string {
 	instanceListCall := c.serviceClient.InstanceTemplates.List(c.base.config.Project)
 	instanceList, err := instanceListCall.Do()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("ComputeInstanceTemplates.List: %s", err)
 	}
 
 	for _, instance := range instanceList.Items {

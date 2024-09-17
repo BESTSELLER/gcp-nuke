@@ -41,7 +41,7 @@ func (c *ComputeInstanceGroupsZone) Setup(config config.Config) {
 
 	computeService, err := compute.NewService(Ctx, option.WithTokenSource(config.GCPToken))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("ComputeInstanceGroupsZone.Setup.NewClient: %s", err)
 	}
 	computeResource := ComputeInstanceGroupsZone{
 		serviceClient: computeService,
@@ -69,7 +69,7 @@ func (c *ComputeInstanceGroupsZone) List(refreshCache bool) []string {
 		instanceListCall := c.serviceClient.InstanceGroupManagers.List(c.base.config.Project, zone)
 		instanceList, err := instanceListCall.Do()
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("ComputeInstanceGroupsZone.List: %s", err)
 		}
 
 		for _, instance := range instanceList.Items {

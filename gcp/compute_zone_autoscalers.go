@@ -38,7 +38,7 @@ func (c *ComputeZoneAutoScalers) Setup(config config.Config) {
 
 	computeService, err := compute.NewService(Ctx, option.WithTokenSource(config.GCPToken))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("ComputeZoneAutoScalers.Setup.NewService: %s", err)
 	}
 	computeResource := ComputeZoneAutoScalers{
 		serviceClient: computeService,
@@ -58,7 +58,7 @@ func (c *ComputeZoneAutoScalers) List(refreshCache bool) []string {
 		instanceListCall := c.serviceClient.Autoscalers.List(c.base.config.Project, zone)
 		instanceList, err := instanceListCall.Do()
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("ComputeZoneAutoScalers.List: %s", err)
 		}
 
 		for _, instance := range instanceList.Items {

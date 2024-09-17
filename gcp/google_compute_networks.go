@@ -38,7 +38,7 @@ func (c *ComputeNetworks) Setup(config config.Config) {
 
 	computeService, err := compute.NewService(Ctx, option.WithTokenSource(config.GCPToken))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("ComputeNetworks.Setup.NewService: %s", err)
 	}
 	computeResource := ComputeNetworks{
 		serviceClient: computeService,
@@ -57,7 +57,7 @@ func (c *ComputeNetworks) List(refreshCache bool) []string {
 	networkListCall := c.serviceClient.Networks.List(c.base.config.Project)
 	networkList, err := networkListCall.Do()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("ComputeNetworks.List: %s", err)
 	}
 
 	for _, network := range networkList.Items {
