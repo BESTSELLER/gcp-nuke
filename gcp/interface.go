@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/BESTSELLER/gcp-nuke/config"
-	"golang.org/x/oauth2/google"
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/option"
 )
@@ -56,31 +55,6 @@ func GetResourceMap(config config.Config) map[string]Resource {
 	return resourceMap
 }
 
-// GetZones -
-func GetZones(defaultContext context.Context, project string) []string {
-	log.Println("[Info] Retrieving zones for project:", project)
-	client, err := google.DefaultClient(defaultContext, compute.ComputeScope)
-	if err != nil {
-		log.Fatalf("GetZones.DefaultClient: %s", err)
-	}
-	serviceClient, err := compute.New(client)
-	if err != nil {
-		log.Fatalf("GetZones.serviceClient: %s", err)
-	}
-	zoneListCall := serviceClient.Zones.List(project)
-	zoneList, err := zoneListCall.Do()
-	if err != nil {
-		log.Fatalf("GetZones.Zones.List: %s", err)
-	}
-
-	zoneStringSlice := []string{}
-	for _, zone := range zoneList.Items {
-		zoneNameSplit := strings.Split(zone.Name, "/")
-		zoneStringSlice = append(zoneStringSlice, zoneNameSplit[len(zoneNameSplit)-1])
-	}
-	return zoneStringSlice
-}
-
 func AddZonesToConfig(defaultContext context.Context, project string, config config.Config) {
 	computeService, err := compute.NewService(defaultContext, option.WithTokenSource(config.GCPToken))
 	if err != nil {
@@ -95,31 +69,6 @@ func AddZonesToConfig(defaultContext context.Context, project string, config con
 		zoneNameSplit := strings.Split(zone.Name, "/")
 		config.Zones = append(config.Zones, zoneNameSplit[len(zoneNameSplit)-1])
 	}
-}
-
-// GetRegions -
-func GetRegions(defaultContext context.Context, project string) []string {
-	log.Println("[Info] Retrieving regions for project:", project)
-	client, err := google.DefaultClient(defaultContext, compute.ComputeScope)
-	if err != nil {
-		log.Fatalf("GetRegions.DefaultClient: %s", err)
-	}
-	serviceClient, err := compute.New(client)
-	if err != nil {
-		log.Fatalf("GetRegions.serviceClient: %s", err)
-	}
-	regionListCall := serviceClient.Regions.List(project)
-	regionList, err := regionListCall.Do()
-	if err != nil {
-		log.Fatalf("GetRegions.Regions.List: %s", err)
-	}
-
-	regionStringSlice := []string{}
-	for _, region := range regionList.Items {
-		regionNameSplit := strings.Split(region.Name, "/")
-		regionStringSlice = append(regionStringSlice, regionNameSplit[len(regionNameSplit)-1])
-	}
-	return regionStringSlice
 }
 
 func AddRegionsToConfig(defaultContext context.Context, project string, config config.Config) {

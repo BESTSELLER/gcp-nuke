@@ -6,7 +6,7 @@ import (
 	"github.com/BESTSELLER/gcp-nuke/config"
 )
 
-func parallelDryRun(resourceMap map[string]Resource, resource Resource, config config.Config) {
+func parallelDryRun(resource Resource, config config.Config) {
 	resourceList := resource.List(false)
 	if len(resourceList) == 0 {
 		log.Printf("[Dryrun] [Skip] Resource type %v has nothing to destroy [project: %v]", resource.Name(), config.Project)

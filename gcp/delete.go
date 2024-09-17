@@ -25,7 +25,7 @@ func RemoveProject(config config.Config) {
 			log.Println("[Info] Retrieving list of resources for", resource.Name())
 			resource.List(true)
 			if config.DryRun {
-				parallelDryRun(resourceMap, resource, config)
+				parallelDryRun(resource, config)
 				return nil
 			}
 			err := parallelResourceDeletion(resourceMap, resource, config)
