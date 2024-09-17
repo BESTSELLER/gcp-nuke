@@ -81,7 +81,7 @@ func GetZones(defaultContext context.Context, project string) []string {
 	return zoneStringSlice
 }
 
-func AddZonesToConfig(defaultContext context.Context, project string, config *config.Config) {
+func AddZonesToConfig(defaultContext context.Context, project string, config config.Config) {
 	computeService, err := compute.NewService(defaultContext, option.WithTokenSource(config.GCPToken))
 	if err != nil {
 		log.Fatalf("AddZonesToConfig.NewService: %s", err)
@@ -122,7 +122,7 @@ func GetRegions(defaultContext context.Context, project string) []string {
 	return regionStringSlice
 }
 
-func AddRegionsToConfig(defaultContext context.Context, project string, config *config.Config) {
+func AddRegionsToConfig(defaultContext context.Context, project string, config config.Config) {
 	computeService, err := compute.NewService(defaultContext, option.WithTokenSource(config.GCPToken))
 	if err != nil {
 		log.Fatalf("AddRegionsToConfig.NewService: %s", err)

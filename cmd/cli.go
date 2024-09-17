@@ -53,7 +53,7 @@ func Command() {
 			if c.String("gcpaccesstoken") == "" {
 				return fmt.Errorf("GCP Access Token not provided")
 			}
-			token := config.ConvertStringToTokenSource(c.String("gcptoken"))
+			token := config.ConvertStringToTokenSource(c.String("gcpaccesstoken"))
 			// Behaviour to delete all resource in parallel in one project at a time - will be made into loop / concurrenct project nuke if required
 			config := config.Config{
 				Project:  c.String("project"),
@@ -65,7 +65,7 @@ func Command() {
 				// Regions:  gcp.GetRegions(gcp.Ctx, c.String("project")),
 				GCPToken: token,
 			}
-			gcp.AddZonesToConfig(gcp.Ctx, c.String("project"), &config)
+			gcp.AddZonesToConfig(gcp.Ctx, c.String("project"), config)
 			gcp.AddRegionsToConfig(gcp.Ctx, c.String("project"), &config)
 
 			if c.String("exclusionsconfig") != "" {
