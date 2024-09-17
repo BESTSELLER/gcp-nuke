@@ -41,7 +41,7 @@ jobs:
         enum: ["test", "release"]
         default: "test"
     docker:
-      - image: goreleaser/goreleaser:v2.0.0
+      - image: goreleaser/goreleaser:v2.3.1
     resource_class: xlarge
     steps:
       - checkout
