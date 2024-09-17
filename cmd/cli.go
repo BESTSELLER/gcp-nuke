@@ -66,7 +66,7 @@ func Command() {
 				GCPToken: token,
 			}
 			gcp.AddZonesToConfig(gcp.Ctx, c.String("project"), config)
-			gcp.AddRegionsToConfig(gcp.Ctx, c.String("project"), &config)
+			gcp.AddRegionsToConfig(gcp.Ctx, c.String("project"), config)
 
 			if c.String("exclusionsconfig") != "" {
 				// Read exclusions config file and marshall into Config.Exclusions struct
