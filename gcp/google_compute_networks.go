@@ -12,6 +12,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sync/syncmap"
 	"google.golang.org/api/compute/v1"
+	"google.golang.org/api/option"
 )
 
 // ComputeNetworks -
@@ -19,17 +20,6 @@ type ComputeNetworks struct {
 	serviceClient *compute.Service
 	base          ResourceBase
 	resourceMap   syncmap.Map
-}
-
-func init() {
-	computeService, err := compute.NewService(Ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-	computeResource := ComputeNetworks{
-		serviceClient: computeService,
-	}
-	register(&computeResource)
 }
 
 // Name - Name of the resourceLister for ComputeNetworks
@@ -40,13 +30,20 @@ func (c *ComputeNetworks) Name() string {
 // ToSlice - Name of the resourceLister for ComputeNetworks
 func (c *ComputeNetworks) ToSlice() (slice []string) {
 	return helpers.SortedSyncMapKeys(&c.resourceMap)
-
 }
 
 // Setup - populates the struct
 func (c *ComputeNetworks) Setup(config config.Config) {
 	c.base.config = config
 
+	computeService, err := compute.NewService(Ctx, option.WithTokenSource(config.GCPToken))
+	if err != nil {
+		log.Fatalf("ComputeNetworks.Setup.NewService: %s", err)
+	}
+	computeResource := ComputeNetworks{
+		serviceClient: computeService,
+	}
+	register(&computeResource)
 }
 
 // List - Returns a list of all ComputeNetworks
@@ -60,7 +57,7 @@ func (c *ComputeNetworks) List(refreshCache bool) []string {
 	networkListCall := c.serviceClient.Networks.List(c.base.config.Project)
 	networkList, err := networkListCall.Do()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("ComputeNetworks.List: %s", err)
 	}
 
 	for _, network := range networkList.Items {
@@ -77,7 +74,6 @@ func (c *ComputeNetworks) Dependencies() []string {
 
 // Remove -
 func (c *ComputeNetworks) Remove() error {
-
 	// Removal logic
 	errs, _ := errgroup.WithContext(c.base.config.Context)
 

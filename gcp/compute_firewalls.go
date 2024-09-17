@@ -12,6 +12,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sync/syncmap"
 	"google.golang.org/api/compute/v1"
+	"google.golang.org/api/option"
 )
 
 // ComputeFirewalls -
@@ -19,17 +20,6 @@ type ComputeFirewalls struct {
 	serviceClient *compute.Service
 	base          ResourceBase
 	resourceMap   syncmap.Map
-}
-
-func init() {
-	computeService, err := compute.NewService(Ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-	computeResource := ComputeFirewalls{
-		serviceClient: computeService,
-	}
-	register(&computeResource)
 }
 
 // Name - Name of the resourceLister for ComputeFirewalls
@@ -40,13 +30,20 @@ func (c *ComputeFirewalls) Name() string {
 // ToSlice - Name of the resourceLister for ComputeFirewalls
 func (c *ComputeFirewalls) ToSlice() (slice []string) {
 	return helpers.SortedSyncMapKeys(&c.resourceMap)
-
 }
 
 // Setup - populates the struct
 func (c *ComputeFirewalls) Setup(config config.Config) {
 	c.base.config = config
 
+	computeService, err := compute.NewService(Ctx, option.WithTokenSource(config.GCPToken))
+	if err != nil {
+		log.Fatalf("ComputeFirewalls.Setup.NewService: %s", err)
+	}
+	computeResource := ComputeFirewalls{
+		serviceClient: computeService,
+	}
+	register(&computeResource)
 }
 
 // List - Returns a list of all ComputeFirewalls
@@ -60,7 +57,7 @@ func (c *ComputeFirewalls) List(refreshCache bool) []string {
 	firewallListCall := c.serviceClient.Firewalls.List(c.base.config.Project)
 	firewallList, err := firewallListCall.Do()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("ComputeFirewalls.List: %s", err)
 	}
 
 	for _, firewall := range firewallList.Items {
@@ -79,7 +76,6 @@ func (c *ComputeFirewalls) Dependencies() []string {
 
 // Remove -
 func (c *ComputeFirewalls) Remove() error {
-
 	// Removal logic
 	errs, _ := errgroup.WithContext(c.base.config.Context)
 

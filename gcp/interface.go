@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/BESTSELLER/gcp-nuke/config"
-	"golang.org/x/oauth2/google"
 	"google.golang.org/api/compute/v1"
+	"google.golang.org/api/option"
 )
 
 // ResourceBase -
@@ -33,8 +33,10 @@ type Resource interface {
 }
 
 // Ctx = context
-var Ctx = context.Background()
-var resourceMap = make(map[string]Resource)
+var (
+	Ctx         = context.Background()
+	resourceMap = make(map[string]Resource)
+)
 
 func register(resource Resource) {
 	_, exists := resourceMap[resource.Name()]
@@ -53,54 +55,36 @@ func GetResourceMap(config config.Config) map[string]Resource {
 	return resourceMap
 }
 
-// GetZones -
-func GetZones(defaultContext context.Context, project string) []string {
-	log.Println("[Info] Retrieving zones for project:", project)
-	client, err := google.DefaultClient(defaultContext, compute.ComputeScope)
+func AddZonesToConfig(defaultContext context.Context, project string, config config.Config) {
+	computeService, err := compute.NewService(defaultContext, option.WithTokenSource(config.GCPToken))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("AddZonesToConfig.NewService: %s", err)
 	}
-	serviceClient, err := compute.New(client)
+	zones, err := computeService.Zones.List(project).Do()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("AddZonesToConfig.List: %s", err)
 	}
-	zoneListCall := serviceClient.Zones.List(project)
-	zoneList, err := zoneListCall.Do()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	zoneStringSlice := []string{}
-	for _, zone := range zoneList.Items {
+	config.Zones = []string{}
+	for _, zone := range zones.Items {
 		zoneNameSplit := strings.Split(zone.Name, "/")
-		zoneStringSlice = append(zoneStringSlice, zoneNameSplit[len(zoneNameSplit)-1])
+		config.Zones = append(config.Zones, zoneNameSplit[len(zoneNameSplit)-1])
 	}
-	return zoneStringSlice
 }
 
-// GetRegions -
-func GetRegions(defaultContext context.Context, project string) []string {
-	log.Println("[Info] Retrieving regions for project:", project)
-	client, err := google.DefaultClient(defaultContext, compute.ComputeScope)
+func AddRegionsToConfig(defaultContext context.Context, project string, config config.Config) {
+	computeService, err := compute.NewService(defaultContext, option.WithTokenSource(config.GCPToken))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("AddRegionsToConfig.NewService: %s", err)
 	}
-	serviceClient, err := compute.New(client)
+	regions, err := computeService.Regions.List(project).Do()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("AddRegionsToConfig.List: %s", err)
 	}
-	regionListCall := serviceClient.Regions.List(project)
-	regionList, err := regionListCall.Do()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	regionStringSlice := []string{}
-	for _, region := range regionList.Items {
+	config.Regions = []string{}
+	for _, region := range regions.Items {
 		regionNameSplit := strings.Split(region.Name, "/")
-		regionStringSlice = append(regionStringSlice, regionNameSplit[len(regionNameSplit)-1])
+		config.Regions = append(config.Regions, regionNameSplit[len(regionNameSplit)-1])
 	}
-	return regionStringSlice
 }
 
 func extractGKESelfLink(input string) string {

@@ -25,11 +25,10 @@ func RemoveProject(config config.Config) {
 			log.Println("[Info] Retrieving list of resources for", resource.Name())
 			resource.List(true)
 			if config.DryRun {
-				parallelDryRun(resourceMap, resource, config)
+				parallelDryRun(resource, config)
 				return nil
 			}
 			err := parallelResourceDeletion(resourceMap, resource, config)
-
 			if err != nil {
 				return err
 			}
@@ -39,7 +38,7 @@ func RemoveProject(config config.Config) {
 
 	// Wait for all deletions to complete, and check for errors
 	if err := errs.Wait(); err != nil {
-		log.Fatal(err)
+		log.Fatalf("RemoveProject: %s", err)
 	}
 
 	log.Printf("-- Deletion complete for project %v (dry-run: %v) --\n", config.Project, config.DryRun)

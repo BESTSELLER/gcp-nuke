@@ -12,6 +12,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sync/syncmap"
 	"google.golang.org/api/bigquery/v2"
+	"google.golang.org/api/option"
 )
 
 type BigQueryDataset struct {
@@ -21,30 +22,26 @@ type BigQueryDataset struct {
 	DatasetIDs    []string
 }
 
-func init() {
-
-	bigqueryService, err := bigquery.NewService(Ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	bigqueryResource := BigQueryDataset{
-		serviceClient: bigqueryService,
-	}
-	register(&bigqueryResource)
-}
-
 func (c *BigQueryDataset) Name() string {
 	return "BigQueryDataset"
 }
 
 func (c *BigQueryDataset) ToSlice() (slice []string) {
 	return helpers.SortedSyncMapKeys(&c.resourceMap)
-
 }
 
 func (c *BigQueryDataset) Setup(config config.Config) {
 	c.base.config = config
+
+	bigqueryService, err := bigquery.NewService(Ctx, option.WithTokenSource(config.GCPToken))
+	if err != nil {
+		log.Fatalf("BigQueryDataset.Setup.NewService: %s", err)
+	}
+
+	bigqueryResource := BigQueryDataset{
+		serviceClient: bigqueryService,
+	}
+	register(&bigqueryResource)
 }
 
 func (c *BigQueryDataset) List(refreshCache bool) []string {
@@ -56,13 +53,11 @@ func (c *BigQueryDataset) List(refreshCache bool) []string {
 
 	datasetList, err := c.serviceClient.Datasets.List(c.base.config.Project).Context(Ctx).Do()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("BigQueryDataset.List: %s", err)
 	}
 
 	for _, dataset := range datasetList.Datasets {
-
 		c.resourceMap.Store(dataset.Id, dataset.DatasetReference.DatasetId)
-
 	}
 
 	return c.ToSlice()
@@ -74,7 +69,6 @@ func (c *BigQueryDataset) Dependencies() []string {
 }
 
 func (c *BigQueryDataset) Remove() error {
-
 	client, err := bq.NewClient(Ctx, c.base.config.Project)
 	if err != nil {
 		return fmt.Errorf("bigquery.NewClient: %v", err)
@@ -105,7 +99,6 @@ func (c *BigQueryDataset) Remove() error {
 				log.Printf("[Info] Resource currently being deleted %v [type: %v project: %v ] (%v seconds)", datasetID, c.Name(), c.base.config.Project, seconds)
 				tableList, _ := c.serviceClient.Tables.List(c.base.config.Project, datasetID).Context(Ctx).Do()
 				if tableList == nil {
-
 					deletedTables = true
 				}
 
