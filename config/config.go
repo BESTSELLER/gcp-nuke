@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+
 	"golang.org/x/oauth2"
 )
 
@@ -39,5 +40,5 @@ type Exclusions struct {
 }
 
 func ConvertStringToTokenSource(token string) oauth2.TokenSource {
-	return oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
+	return oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token, TokenType: "token"})
 }
