@@ -1,10 +1,11 @@
 module github.com/BESTSELLER/gcp-nuke
 
 go 1.23.1
+toolchain go1.24.1
 
 require (
 	cloud.google.com/go/bigquery v1.66.2
-	github.com/urfave/cli/v2 v2.27.5
+	github.com/urfave/cli/v2 v2.27.6
 	golang.org/x/exp v0.0.0-20240909161429-701f63a606c0
 	golang.org/x/oauth2 v0.27.0
 	golang.org/x/sync v0.11.0
