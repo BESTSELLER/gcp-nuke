@@ -17,7 +17,6 @@ approval_rules:
   - name: tests passed
     if:
       has_workflow_result:
-        conclusions: ["success"]
         workflows:
           - ".github/workflows/release.yml"
     requires:
