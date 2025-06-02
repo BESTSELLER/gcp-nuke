@@ -9,9 +9,7 @@ metadata:
     - pipeline
   annotations:
     github.com/project-slug:  BESTSELLER/gcp-nuke
-    circleci.com/project-slug: github/BESTSELLER/gcp-nuke
 spec:
   type: service
   lifecycle: production
   owner: engineering-services
----
