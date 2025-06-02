@@ -16,9 +16,10 @@ policy:
 approval_rules:
   - name: tests passed
     if:
-      has_successful_status:
-        - "test"
-        - "GitGuardian Security Checks"
+      has_workflow_result:
+        conclusions: ["success"]
+        workflows:
+          - ".github/workflows/release.yml"
     requires:
       count: 0
   - name: es has approved
@@ -31,6 +32,5 @@ approval_rules:
       has_author_in:
         users:
           - "dependabot[bot]"
-          - "dependabot-circleci[bot]"
     requires:
       count: 0
