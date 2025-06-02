@@ -15,12 +15,12 @@ policy:
         - "bestseller"
 approval_rules:
   - name: tests passed
-    if:
-      has_workflow_result:
-        workflows:
-          - ".github/workflows/release.yml"
     requires:
       count: 0
+      conditions:
+        has_workflow_result:
+          workflows:
+            - ".github/workflows/release.yml"
   - name: es has approved
     requires:
       count: 1
