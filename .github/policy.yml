@@ -1,35 +1,33 @@
 policy:
   approval:
     - or:
-      - and:
-          - tests passed
-          - es has approved
-      - and:
-          - dependabot is making the PR
-          - or:
-              - tests passed
-              - es has approved
+        - and:
+            - tests passed
+            - es has approved
+        - and:
+            - dependabot is making the PR
+            - tests passed
   disapproval:
     requires:
       organizations:
         - "bestseller"
+
 approval_rules:
   - name: tests passed
-    if:
-      has_workflow_result:
-        workflows:
-          - ".github/workflows/release.yml"
+    requires:
+      conditions:
+        has_workflow_result:
+          workflows:
+            - ".github/workflows/release.yml"
+  - name: dependabot is making the PR
     requires:
       count: 0
+      conditions:
+        has_author_in:
+          users:
+            - "dependabot[bot]"
   - name: es has approved
     requires:
       count: 1
       teams:
         - "BESTSELLER/engineering-services"
-  - name: dependabot is making the PR
-    if:
-      has_author_in:
-        users:
-          - "dependabot[bot]"
-    requires:
-      count: 0
