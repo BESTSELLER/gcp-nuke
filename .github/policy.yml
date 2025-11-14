@@ -3,7 +3,7 @@ policy:
     - or:
         - and:
             - tests passed
-            - es has approved
+            - developer platform has approved
         - and:
             - dependabot is making the PR
             - tests passed
@@ -26,8 +26,8 @@ approval_rules:
         has_author_in:
           users:
             - "dependabot[bot]"
-  - name: es has approved
+  - name: developer platform has approved
     requires:
       count: 1
       teams:
-        - "BESTSELLER/engineering-services"
+        - "BESTSELLER/developer-platform"
